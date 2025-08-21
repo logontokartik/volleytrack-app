@@ -6,3 +6,4 @@ html, body, #root { height: 100%; }
 @media (max-width: 640px) {
   body { padding-bottom: max(env(safe-area-inset-bottom), 88px); }
 }
+EOF
