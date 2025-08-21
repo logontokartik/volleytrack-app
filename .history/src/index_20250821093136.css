@@ -1,8 +1,0 @@
-@import "tailwindcss";
-
-html, body, #root { height: 100%; }
-
-/* Make room for sticky mobile footer controls */
-@media (max-width: 640px) {
-  body { padding-bottom: max(env(safe-area-inset-bottom), 88px); }
-}
