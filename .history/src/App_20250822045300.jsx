@@ -988,50 +988,25 @@ export default function App() {
 
       {/* Sticky mobile scorer */}
       {isMobile && selectedMatch && (
-        <div className="fixed bottom-0 inset-x-0 border-t bg-white/95 backdrop-blur p-3" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 10px)' }}>
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-start gap-3">
-              <div className="flex-1 min-w-0">
-                {(() => {
-                  const active = getActiveSet(selectedMatch.sets, selectedMatch.match);
-                  if (!active) return null;
-                  const t1 = selectedMatch.match.team1?.name || "Team 1";
-                  const t2 = selectedMatch.match.team2?.name || "Team 2";
-                  const target = pointsToWinForMatch(selectedMatch.match, active.set_number);
-                  return (
-                    <>
-                      <div className="text-[11px] opacity-70 truncate">Active Set • to {target} (win by 2)</div>
-                      <div className="font-medium truncate">{t1} vs {t2}</div>
-                      <div className="grid grid-cols-2 gap-2 mt-2">
-                        {/* Team 1 pad */}
-                        <div className="rounded-xl border p-2">
-                          <div className="text-[11px] opacity-70 truncate">{t1}</div>
-                          <div className="flex items-center justify-between gap-2 mt-1">
-                            <button disabled={!(isAdmin || isCaptain)} onClick={()=>adjustPoint(active.id,'team1_points',-1)} className="min-w-12 min-h-12 rounded-full border bg-white active:scale-[0.98]">−</button>
-                            <div className="text-2xl font-semibold tabular-nums">{active.team1_points}</div>
-                            <button disabled={!(isAdmin || isCaptain)} onClick={()=>adjustPoint(active.id,'team1_points',+1)} className="min-w-12 min-h-12 rounded-full border bg-black text-white active:scale-[0.98]">+</button>
-                          </div>
-                        </div>
-                        {/* Team 2 pad */}
-                        <div className="rounded-xl border p-2">
-                          <div className="text-[11px] opacity-70 truncate">{t2}</div>
-                          <div className="flex items-center justify-between gap-2 mt-1">
-                            <button disabled={!(isAdmin || isCaptain)} onClick={()=>adjustPoint(active.id,'team2_points',-1)} className="min-w-12 min-h-12 rounded-full border bg-white active:scale-[0.98]">−</button>
-                            <div className="text-2xl font-semibold tabular-nums">{active.team2_points}</div>
-                            <button disabled={!(isAdmin || isCaptain)} onClick={()=>adjustPoint(active.id,'team2_points',+1)} className="min-w-12 min-h-12 rounded-full border bg-black text-white active:scale-[0.98]">+</button>
-                          </div>
-                        </div>
-                      </div>
-                    </>
-                  );
-                })()}
-              </div>
-              <div className="flex flex-col gap-2 shrink-0">
-                {(isAdmin || isCaptain) && <button onClick={completeMatch} className="px-4 py-2 rounded-2xl bg-emerald-600 text-white shadow-sm">Complete</button>}
-                <button onClick={()=>setSelectedMatch(null)} className="grid place-items-center min-w-11 min-h-11 rounded-2xl border bg-white">
-                  <X className="w-5 h-5"/>
-                </button>
-              </div>
+        <div className="fixed bottom-0 inset-x-0 border-t bg-white/95 backdrop-blur p-3 pt-2" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 12px)' }}>
+          <div className="flex items-center justify-between gap-2">
+            <div className="min-w-0">
+              <div className="text-xs opacity-60 truncate">Active Set</div>
+              <div className="font-medium truncate">{selectedMatch.match.team1?.name} vs {selectedMatch.match.team2?.name}</div>
+            </div>
+            <div className="flex items-center gap-2">
+              {(() => {
+                const active = getActiveSet(selectedMatch.sets, selectedMatch.match);
+                if (!active) return null;
+                return (
+                  <>
+                    <IconBtn disabled={!(isAdmin || isCaptain)} onClick={()=>adjustPoint(active.id, 'team1_points', +1)} className="bg-black text-white">+ {selectedMatch.match.team1?.name?.split(' ')[0]}</IconBtn>
+                    <IconBtn disabled={!(isAdmin || isCaptain)} onClick={()=>adjustPoint(active.id, 'team2_points', +1)} className="bg-black text-white">+ {selectedMatch.match.team2?.name?.split(' ')[0]}</IconBtn>
+                  </>
+                );
+              })()}
+              {(isAdmin || isCaptain) && <Button onClick={completeMatch} className="bg-emerald-600 text-white">Complete</Button>}
+              <IconBtn onClick={()=>setSelectedMatch(null)} className="bg-white"><X className="w-5 h-5"/></IconBtn>
             </div>
           </div>
         </div>
