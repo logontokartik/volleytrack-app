@@ -171,12 +171,6 @@ export default function App() {
           .eq("user_id", session.user.id)
           .maybeSingle();
         setIsAdmin(!!adminRow);
-        const { data: capRow } = await client
-          .from("app_captains")
-          .select("user_id")
-          .eq("user_id", session.user.id)
-          .maybeSingle();
-        setIsCaptain(!!capRow);
       } else {
         setIsAdmin(false);
       }
@@ -950,7 +944,7 @@ export default function App() {
                 </div>
                 {!isMobile && (
                   <div className="flex gap-2">
-                    {(isAdmin || isCaptain) && <Button onClick={completeMatch} className="bg-emerald-600 text-white">Mark Completed & Pick Winner</Button>}
+                    {isAdmin && <Button onClick={completeMatch} className="bg-emerald-600 text-white">Mark Completed & Pick Winner</Button>}
                     <Button onClick={()=>setSelectedMatch(null)} className="bg-white">Close</Button>
                   </div>
                 )}
@@ -970,9 +964,9 @@ export default function App() {
                           <div key={field} className="border rounded-xl p-3">
                             <div className="text-xs opacity-70 mb-2">{idx===0? selectedMatch.match.team1?.name : selectedMatch.match.team2?.name}</div>
                             <div className="flex items-center justify-between">
-                              <IconBtn disabled={!(isAdmin || isCaptain)} onClick={()=>adjustPoint(s.id, field, -1)} className="bg-white">–</IconBtn>
+                              <IconBtn disabled={!isAdmin} onClick={()=>adjustPoint(s.id, field, -1)} className="bg-white">–</IconBtn>
                               <div className="text-3xl font-semibold">{s[field]}</div>
-                              <IconBtn disabled={!(isAdmin || isCaptain)} onClick={()=>adjustPoint(s.id, field, +1)} className="bg-black text-white">+</IconBtn>
+                              <IconBtn disabled={!isAdmin} onClick={()=>adjustPoint(s.id, field, +1)} className="bg-black text-white">+</IconBtn>
                             </div>
                           </div>
                         ))}
@@ -1000,12 +994,12 @@ export default function App() {
                 if (!active) return null;
                 return (
                   <>
-                    <IconBtn disabled={!(isAdmin || isCaptain)} onClick={()=>adjustPoint(active.id, 'team1_points', +1)} className="bg-black text-white">+ {selectedMatch.match.team1?.name?.split(' ')[0]}</IconBtn>
-                    <IconBtn disabled={!(isAdmin || isCaptain)} onClick={()=>adjustPoint(active.id, 'team2_points', +1)} className="bg-black text-white">+ {selectedMatch.match.team2?.name?.split(' ')[0]}</IconBtn>
+                    <IconBtn disabled={!isAdmin} onClick={()=>adjustPoint(active.id, 'team1_points', +1)} className="bg-black text-white">+ {selectedMatch.match.team1?.name?.split(' ')[0]}</IconBtn>
+                    <IconBtn disabled={!isAdmin} onClick={()=>adjustPoint(active.id, 'team2_points', +1)} className="bg-black text-white">+ {selectedMatch.match.team2?.name?.split(' ')[0]}</IconBtn>
                   </>
                 );
               })()}
-              {(isAdmin || isCaptain) && <Button onClick={completeMatch} className="bg-emerald-600 text-white">Complete</Button>}
+              {isAdmin && <Button onClick={completeMatch} className="bg-emerald-600 text-white">Complete</Button>}
               <IconBtn onClick={()=>setSelectedMatch(null)} className="bg-white"><X className="w-5 h-5"/></IconBtn>
             </div>
           </div>
