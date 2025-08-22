@@ -939,14 +939,6 @@ export default function App() {
                     <div className="text-xs opacity-60">{fmtDateTime(m.scheduled_at)}</div>
                     <div className="font-medium">{m.team1?.name} vs {m.team2?.name}</div>
                     <div className="text-xs capitalize opacity-70">{m.status}</div>
-                    {(() => {
-                      const sets = allSets.filter(s=>s.match_id===m.id).sort((a,b)=>a.set_number-b.set_number);
-                      if (!sets.length) return null;
-                      let sw1=0, sw2=0;
-                      for (const s of sets) { const w=setWinnerStrictForMatch(s,m); if (w===1) sw1++; else if (w===2) sw2++; }
-                      const active = getActiveSet(sets, m) || sets[sets.length-1];
-                      return (<div className="text-xs mt-1">Live: <span className="font-medium">{active.team1_points}</span>-<span className="font-medium">{active.team2_points}</span> • Sets {sw1}-{sw2}</div>);
-                    })()}
                   </div>
                   <div className="flex gap-2">
                     <IconBtn onClick={()=>openMatch(m.id)} className="bg-white"><Edit3 className="w-5 h-5"/></IconBtn>
@@ -973,7 +965,7 @@ export default function App() {
                   {matches.map((m)=> (
                     <tr key={m.id}>
                       <td className="py-2">{fmtDateTime(m.scheduled_at)}</td>
-                      <td className="py-2"><div>{m.team1?.name} vs {m.team2?.name}</div>{(() => {const sets = allSets.filter(s=>s.match_id===m.id).sort((a,b)=>a.set_number-b.set_number); if (!sets.length) return null; let sw1=0, sw2=0; for (const s of sets) { const w=setWinnerStrictForMatch(s,m); if (w===1) sw1++; else if (w===2) sw2++; } const active = getActiveSet(sets, m) || sets[sets.length-1]; return (<div className="text-xs opacity-70 mt-0.5">Live: <span className="font-medium">{active.team1_points}</span>-<span className="font-medium">{active.team2_points}</span> • Sets {sw1}-{sw2}</div>); })()}</td>
+                      <td className="py-2">{m.team1?.name} vs {m.team2?.name}</td>
                       <td className="py-2 capitalize">{m.status}</td>
                       <td className="py-2 flex gap-2">
                         <Button onClick={()=>openMatch(m.id)} className="bg-white flex items-center gap-1"><Edit3 className="w-4 h-4"/>Open</Button>
