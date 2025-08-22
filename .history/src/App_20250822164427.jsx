@@ -778,7 +778,7 @@ export default function App() {
                               <th className="py-2">L</th>
                               <th className="py-2">SW</th>
                               <th className="py-2">SL</th>
-                              <th className="py-2">Diff±</th>
+                              <th className="py-2">Pts±</th>
                             </tr>
                           </thead>
                           <tbody>
