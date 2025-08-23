@@ -158,7 +158,6 @@ export default function App() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [bracketAssign, setBracketAssign] = useState({}); // { [matchId]: { team1, team2 } }
-  const [bracketTimes, setBracketTimes] = useState({ semi1: "", semi2: "", final: "" }); // { [matchId]: { team1, team2 } }
 
   // Auth session + admin check
   useEffect(() => {
@@ -521,20 +520,10 @@ export default function App() {
     const semis = matches.filter((m) => (m.stage || "").toLowerCase() === "semi");
     const finals = matches.filter((m) => (m.stage || "").toLowerCase() === "final");
     let created = 0;
-
-    // Create up to 2 semi placeholders with optional scheduled_at from bracketTimes
     for (let i = semis.length; i < 2; i++) {
-      const when = i === semis.length ? (bracketTimes.semi1 || null) : (bracketTimes.semi2 || null);
       const { data: m, error } = await client
         .from("matches")
-        .insert({
-          tournament_id: selectedTid,
-          team1_id: null,
-          team2_id: null,
-          status: "scheduled",
-          stage: "semi",
-          scheduled_at: when,
-        })
+        .insert({ tournament_id: selectedTid, team1_id: null, team2_id: null, status: "scheduled", stage: "semi" })
         .select("*")
         .single();
       if (!error && m) {
@@ -545,19 +534,10 @@ export default function App() {
         return;
       }
     }
-
-    // Create 1 final placeholder with optional scheduled_at from bracketTimes
     if (finals.length < 1) {
       const { data: m2, error: e2 } = await client
         .from("matches")
-        .insert({
-          tournament_id: selectedTid,
-          team1_id: null,
-          team2_id: null,
-          status: "scheduled",
-          stage: "final",
-          scheduled_at: bracketTimes.final || null,
-        })
+        .insert({ tournament_id: selectedTid, team1_id: null, team2_id: null, status: "scheduled", stage: "final" })
         .select("*")
         .single();
       if (!e2 && m2) {
@@ -568,25 +548,7 @@ export default function App() {
         return;
       }
     }
-
-    // If nothing new was created but admin entered times, apply to existing placeholders
-    if (created === 0) {
-      const semisNow = matches.filter((m) => (m.stage || "").toLowerCase() === "semi").slice(0, 2).sort((a, b) => (a.id || 0) - (b.id || 0));
-      if (semisNow.length >= 1 && bracketTimes.semi1) {
-        await client.from("matches").update({ scheduled_at: bracketTimes.semi1 }).eq("id", semisNow[0].id);
-      }
-      if (semisNow.length >= 2 && bracketTimes.semi2) {
-        await client.from("matches").update({ scheduled_at: bracketTimes.semi2 }).eq("id", semisNow[1].id);
-      }
-      const finalsNow = matches.filter((m) => (m.stage || "").toLowerCase() === "final");
-      if (finalsNow.length >= 1 && bracketTimes.final) {
-        await client.from("matches").update({ scheduled_at: bracketTimes.final }).eq("id", finalsNow[0].id);
-      }
-      if (!bracketTimes.semi1 && !bracketTimes.semi2 && !bracketTimes.final) {
-        alert("Bracket placeholders already exist.");
-      }
-    }
-
+    if (created === 0) alert("Bracket placeholders already exist.");
     setRefresh((x) => x + 1);
   }
 
@@ -1185,16 +1147,13 @@ export default function App() {
                   <Trophy className="w-4 h-4" /> Bracket
                 </h2>
                 {isAdmin && (
-                  <div className="w-full flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:mr-2 w-full sm:w-auto">
-                      <Input type="datetime-local" value={bracketTimes.semi1} onChange={(e)=>setBracketTimes(prev=>({...prev, semi1: e.target.value}))} placeholder="Semi 1 date/time" />
-                      <Input type="datetime-local" value={bracketTimes.semi2} onChange={(e)=>setBracketTimes(prev=>({...prev, semi2: e.target.value}))} placeholder="Semi 2 date/time" />
-                      <Input type="datetime-local" value={bracketTimes.final} onChange={(e)=>setBracketTimes(prev=>({...prev, final: e.target.value}))} placeholder="Final date/time" />
-                    </div>
-                    <div className="flex gap-2">
-                      <Button onClick={createBracketPlaceholders} className="bg-black text-white">Generate placeholders</Button>
-                      <Button onClick={autoSeedSemisFromPools} className="bg-white">Auto-seed A1/B2 & A2/B1</Button>
-                    </div>
+                  <div className="flex gap-2">
+                    <Button onClick={createBracketPlaceholders} className="bg-black text-white">
+                      Generate placeholders
+                    </Button>
+                    <Button onClick={autoSeedSemisFromPools} className="bg-white">
+                      Auto-seed A1/B2 & A2/B1
+                    </Button>
                   </div>
                 )}
               </div>
